@@ -32,7 +32,7 @@ def drop_outliers(X, target=target, threshold = 3):
     target: The name of the target column
     threshold: The zscore level defining outliers
     :return:
-    The normalized dataset as a combination of standardized features but with the
+    The normalized data as a combination of standardized features but with the
     normal values for the target
     '''
 

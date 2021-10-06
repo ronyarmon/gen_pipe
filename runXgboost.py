@@ -9,7 +9,7 @@ print(data.head())
 #split target and features
 X, y = data.iloc[:, :-1], data.iloc[:,-1]
 
-#Convert the dataset into Dmatrix
+#Convert the data into Dmatrix
 data_dmatrix = xgb.DMatrix(data=X,label=y)
 
 #train-test split

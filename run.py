@@ -12,8 +12,8 @@ from ml.explore import *
 target = 'median_house_value'
 metadata = ['latitude', 'longitude']
 categorical = ['ocean_proximity']
-dataset_path = ('./dataset/dataset.csv')
-if 'dataset.csv' not in os.listdir('./dataset'):
+dataset_path = ('./data/dataset.csv')
+if 'data.csv' not in os.listdir('./data'):
     url_path = 'https://raw.githubusercontent.com/nyandwi/public_datasets/master/housing.csv'
     url_path = urllib.request.urlretrieve(url_path)[0]
     dataset = pd.read_csv(url_path)
