@@ -9,35 +9,16 @@ from ml.preProcess import *
 from ml.explore import *
 
 # Dataset
-target = 'median_house_value'
+dataset_path = ('./data/california_data.csv')
+dataset = pd.read_csv(dataset_path)
+target = 'PRICE'
 metadata = ['latitude', 'longitude']
 categorical = ['ocean_proximity']
-dataset_path = ('./data/california_data.csv')
-if 'data.csv' not in os.listdir('./data'):
-    url_path = 'https://raw.githubusercontent.com/nyandwi/public_datasets/master/housing.csv'
-    url_path = urllib.request.urlretrieve(url_path)[0]
-    dataset = pd.read_csv(url_path)
-    dataset.to_csv(dataset_path, index=False)
-else:
-    dataset = pd.read_csv(dataset_path)
 
 exclude_columns = metadata + categorical
 feature_names = [c for c in dataset.columns if c not in exclude_columns]
-
-# Models
-models = [LinearRegression(), SGDRegressor(), DecisionTreeRegressor(), LinearSVR(), SVR()]
-
-
 dataset = dataset[feature_names]
-print(dataset.head())
-# Results paths and directories
-# metadata dictionary
-rows_count, features_count = len(dataset), len(dataset.columns)-1
-metadata_dict = {'instances': rows_count, 'features': features_count}
-np.save('metadata.npy', metadata_dict)
-metadata_dict1 = np.load('metadata.npy', allow_pickle=True)[()]
-from paths import *
-print('Run results: results/{n}'.format(n=run_dir_name))
+
 
 ## EDA ##
 # Mean, standard deviation and median
@@ -111,41 +92,28 @@ print('Top correlated features')
 print(correlated_features)
 
 # Train/Test
-features = dataset.drop([target], axis=1)
-labels = dataset[target]
-train_set, test_set = train_test_split(dataset, test_size=0.2, random_state=42)
-train_features = train_set.drop([target], axis=1)
-train_labels = train_set[target]
-test_features = test_set.drop([target], axis=1)
-test_labels = test_set[target]
+X = dataset.drop([target], axis=1)
+y = dataset[target]
 
-# Run models
-model_names = [model.__class__.__name__ for model in models]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=123)
 
-results = []
-for index, model in enumerate(models):
-    model_name = model_names[index]
-    print('model name:', model_name)
-    model.fit(train_features, train_labels)
-    predictions = model.predict(train_features)
+params = {'n_estimators':100, 'max_depth':3, 'learning_rate': 0.01}
+#model = xgb.XGBRegressor(n_estimators=100, max_depth=3, learning_rate=0.01)
+model = xgb.XGBRegressor(**params)
+model.fit(X_train, y_train,
+          eval_set=[(X_train, y_train), (X_test, y_test)],
+          early_stopping_rounds=20)
 
-    ## Evaluation ##
-    # rmse: train set
-    mse = mean_squared_error(train_labels, predictions)
-    rmse_train = round(np.sqrt(mse))
+optimal_tree = model.best_ntree_limit
+print('optimal_tree:', optimal_tree)
 
-    ## rmse: test set
-    predictions = model.predict(test_features)
-    mse = mean_squared_error(test_labels, predictions)
-    rmse_test = round(np.sqrt(mse))
+preds = model.predict(X_test)
+preds_optimal_tree = model.predict(X_test, ntree_limit=optimal_tree)
 
-    # cross validation rmse
-    scoring = 'neg_root_mean_squared_error'
-    scores = cross_val_score(model, features, labels,  scoring=scoring, cv=5)
-    scores = -scores
-    cv_rmse = round(scores.mean())
-    results.append([model_name, rmse_train, rmse_test, cv_rmse])
+# Compute rmse
+rmse = np.sqrt(mean_squared_error(y_test, preds))
+print("RMSE: {r}".format(r=rmse))
+rmse = np.sqrt(mean_squared_error(y_test, preds_optimal_tree))
+print("optimal tree RMSE: {r}".format(r=rmse))
 
-results_headers = ['model', 'rmse-train', 'rmse-test', 'cv_rmse']
-models_evals = pd.DataFrame(results, columns=results_headers)
-print(models_evals)
+

@@ -7,7 +7,7 @@ import urllib.request
 
 import pandas as pd
 import numpy as np
-import tensorflow as tf
+#import tensorflow as tf
 
 import sklearn
 from sklearn.impute import SimpleImputer
@@ -16,6 +16,8 @@ from sklearn.model_selection import train_test_split
 # Models
 from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.svm import LinearSVR, SVR
+
+import xgboostPipeline as xgb
 
 
 # Evaluation
