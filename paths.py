@@ -5,7 +5,6 @@ from libraries import *
 from utils.directories import *
 project_files_dirs = os.listdir()
 
-
 dataset_dir, results_dir = ('./data', './results')
 print('results_dir:', results_dir)
 

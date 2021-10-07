@@ -19,7 +19,6 @@ exclude_columns = metadata + categorical
 feature_names = [c for c in dataset.columns if c not in exclude_columns]
 dataset = dataset[feature_names]
 
-
 ## EDA ##
 # Mean, standard deviation and median
 desc_stats = dataset.describe().T[['mean', 'std', '50%']]
