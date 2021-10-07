@@ -1,5 +1,5 @@
 import sys
-modules_path = './modules'
+modules_path = '../modules'
 sys.path.append(modules_path)
 
 from libraries import *
