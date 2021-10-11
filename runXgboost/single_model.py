@@ -1,5 +1,5 @@
 import sys
-modules_path = './modules'
+modules_path = '/home/rony/gen_pipe/modules'
 sys.path.append(modules_path)
 #!/usr/bin/env python
 # coding: utf-8
